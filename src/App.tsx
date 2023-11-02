@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import Synthesizer from 'audio/Synthesizer';
+import Synthesizer from 'audio/synthesizer';
 
 const waveforms = ['sine', 'sawtooth', 'square', 'triangle'];
 
