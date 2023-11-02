@@ -18,8 +18,4 @@ export default class Gain {
   connectChildNode = (childNode: AudioNode) => {
     childNode.connect(this.gainNode);
   };
-
-  getCurrentValue = () => {
-    return this.gainNode.gain.value;
-  };
 }

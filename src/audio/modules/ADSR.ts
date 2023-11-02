@@ -1,4 +1,4 @@
-import Gain from './gain';
+import Gain from './Gain';
 
 export default class ADSR extends Gain {
   constructor(synthCtx: AudioContext, parentGainNode: Gain) {

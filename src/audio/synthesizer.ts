@@ -1,23 +1,44 @@
+import { ControlPanel, Gain, LFO, Oscillator } from './modules';
 import notes from './constants/notes';
-import Gain from './gain';
-import Oscillator from './oscillator';
 
 export default class Synthesizer {
-  private ctx: AudioContext | null;
+  private osc: Oscillator;
 
-  private keys: Record<string, Oscillator>;
+  private lfo: LFO;
 
   private masterVolume: Gain;
 
+  private controlPanel: ControlPanel;
+
+  private keys: Record<string, { play: () => void; stop: () => void }>;
+
   constructor(waveform: OscillatorType = 'sine') {
     const context = new AudioContext();
-    this.ctx = context;
+
     this.masterVolume = new Gain(context);
     this.masterVolume.setLevel(0);
+
+    this.osc = new Oscillator(context, this.masterVolume, 220, waveform);
+
+    this.lfo = new LFO(context);
+
+    this.osc.connectToLfo(this.lfo.getGainNode());
+    this.osc.initStart();
+
+    this.controlPanel = new ControlPanel(this.masterVolume, this.osc, this.lfo);
+
     this.keys = notes.reduce(
       (acc, { note, freq }) => ({
         ...acc,
-        [note]: new Oscillator(context, this.masterVolume, freq, waveform),
+        [note]: {
+          play: () => {
+            this.osc.setFrequency(freq);
+            this.osc.play();
+          },
+          stop: () => {
+            this.osc.stop();
+          },
+        },
       }),
       {},
     );
@@ -27,19 +48,11 @@ export default class Synthesizer {
     return this.keys;
   };
 
-  changeWaveform = (newType: OscillatorType) => {
-    Object.keys(this.keys).forEach((key) => {
-      this.keys[key].changeWaveform(newType);
-    });
+  getControls = () => {
+    return this.controlPanel.getControls();
   };
 
-  setVolume = (value: number) => {
-    if (value < -1 || value > 0.2) return;
-
-    this.masterVolume.setLevel(value);
-  };
-
-  getVolume = () => {
-    return this.masterVolume.getCurrentValue();
+  getControlsState = () => {
+    return this.controlPanel.getState();
   };
 }
