@@ -1,5 +1,5 @@
 import { ControlPanel, Gain, LFO, Oscillator } from './modules';
-import notes from './constants/notes';
+import { notes } from './constants';
 
 export default class Synthesizer {
   private osc: Oscillator;
@@ -12,15 +12,13 @@ export default class Synthesizer {
 
   private keys: Record<string, { play: () => void; stop: () => void }>;
 
-  constructor(waveform: OscillatorType = 'sine') {
-    const context = new AudioContext();
-
-    this.masterVolume = new Gain(context);
+  constructor(audioContext: AudioContext) {
+    this.masterVolume = new Gain(audioContext);
     this.masterVolume.setLevel(0);
 
-    this.osc = new Oscillator(context, this.masterVolume, 220, waveform);
+    this.osc = new Oscillator(audioContext, this.masterVolume, 220);
 
-    this.lfo = new LFO(context);
+    this.lfo = new LFO(audioContext);
 
     this.osc.connectToLfo(this.lfo.getGainNode());
     this.osc.initStart();

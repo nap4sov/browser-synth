@@ -2,7 +2,7 @@ import Gain from './Gain';
 import LFO from './LFO';
 import Oscillator from './Oscillator';
 
-interface ControlPanelState {
+export interface ControlPanelState {
   master: {
     volume: number;
   };
@@ -16,7 +16,7 @@ interface ControlPanelState {
   };
 }
 
-interface ControlPanelControls {
+export interface ControlPanelControls {
   master: {
     setVolume: (value: number) => void;
   };

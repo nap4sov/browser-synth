@@ -14,7 +14,7 @@ export default class Oscillator {
     synthCtx: AudioContext,
     parentGainNode: Gain,
     freq: number,
-    type: OscillatorType,
+    type: OscillatorType = 'sine',
   ) {
     this.synthCtx = synthCtx;
     this.osc = synthCtx.createOscillator();
