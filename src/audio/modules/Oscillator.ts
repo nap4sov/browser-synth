@@ -10,6 +10,8 @@ export default class Oscillator {
 
   private frequency: number;
 
+  private glideTime = 0.01;
+
   constructor(
     synthCtx: AudioContext,
     parentGainNode: Gain,
@@ -32,11 +34,11 @@ export default class Oscillator {
   };
 
   play = () => {
-    this.adsr.setLevel(1);
+    this.adsr.play();
   };
 
   stop = () => {
-    this.adsr.setLevel(0);
+    this.adsr.stop();
   };
 
   setWaveform = (newType: OscillatorType) => {
@@ -49,7 +51,10 @@ export default class Oscillator {
 
   setFrequency = (freq: number) => {
     this.frequency = freq;
-    this.osc.frequency.setValueAtTime(freq, this.synthCtx.currentTime);
+    this.osc.frequency.exponentialRampToValueAtTime(
+      freq,
+      this.synthCtx.currentTime + this.glideTime,
+    );
   };
 
   getFrequency = () => {

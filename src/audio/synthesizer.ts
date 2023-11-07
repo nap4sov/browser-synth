@@ -1,5 +1,6 @@
 import { ControlPanel, Gain, LFO, Oscillator } from './modules';
 import { notes } from './constants';
+import { TKeyboard } from './types';
 
 export default class Synthesizer {
   private osc: Oscillator;
@@ -10,13 +11,13 @@ export default class Synthesizer {
 
   private controlPanel: ControlPanel;
 
-  private keys: Record<string, { play: () => void; stop: () => void }>;
+  private keys: TKeyboard;
 
   constructor(audioContext: AudioContext) {
     this.masterVolume = new Gain(audioContext);
     this.masterVolume.setLevel(0);
 
-    this.osc = new Oscillator(audioContext, this.masterVolume, 220);
+    this.osc = new Oscillator(audioContext, this.masterVolume, 440);
 
     this.lfo = new LFO(audioContext);
 
@@ -35,6 +36,9 @@ export default class Synthesizer {
           },
           stop: () => {
             this.osc.stop();
+          },
+          changeFrequency: () => {
+            this.osc.setFrequency(freq);
           },
         },
       }),

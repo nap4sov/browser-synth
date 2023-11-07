@@ -1,21 +1,14 @@
-import { useState, useEffect, TouchEventHandler } from 'react';
+import { useState, useEffect } from 'react';
 import './styles.css';
+import { TKeyboard } from 'audio/types';
 
 const KEY_WIDTH = 60;
 
-const Keyboard = ({
-  keyboard,
-}: {
-  keyboard: Record<string, { play: () => void; stop: () => void }>;
-}) => {
+const Keyboard = ({ keyboard }: { keyboard: TKeyboard }) => {
   const [currentNote, setCurrentNote] = useState('');
   const [mousePressed, setMousePressed] = useState(false);
 
-  const handleTouchDrag: TouchEventHandler<HTMLDivElement> = (e) => {
-    if (!keyboard) return;
-
-    const x = e.touches[0].pageX;
-    const y = e.touches[0].pageY;
+  const handleNoteChange = (x: number, y: number, isStart: boolean) => {
     const element = document.elementFromPoint(x, y);
     if (element?.nodeName !== 'BUTTON') return;
 
@@ -24,7 +17,18 @@ const Keyboard = ({
     if (!note || note === currentNote) return;
 
     setCurrentNote(note);
-    keyboard[note].play();
+    if (isStart) {
+      keyboard[note].play();
+    } else {
+      keyboard[note].changeFrequency();
+    }
+  };
+
+  const handleNoteStop = () => {
+    if (!currentNote) return;
+
+    setCurrentNote('');
+    keyboard[currentNote].stop();
   };
 
   useEffect(() => {
@@ -36,8 +40,6 @@ const Keyboard = ({
     };
     window.addEventListener('mousedown', handleMousePressed);
     window.addEventListener('mouseup', handleMouseReleased);
-    window.addEventListener('touchstart', handleMousePressed);
-    window.addEventListener('touchend', handleMouseReleased);
 
     return () => {
       window.removeEventListener('mousedown', handleMousePressed);
@@ -48,12 +50,26 @@ const Keyboard = ({
   return (
     <div
       className="keyboard"
-      onTouchMove={handleTouchDrag}
-      onTouchEnd={() => {
-        if (!currentNote || !keyboard) return;
-
-        keyboard[currentNote].stop();
+      onTouchStart={(e) => {
+        handleNoteChange(e.touches[0].pageX, e.touches[0].pageY, true);
       }}
+      onTouchMove={(e) => {
+        handleNoteChange(e.touches[0].pageX, e.touches[0].pageY, false);
+      }}
+      onTouchEnd={handleNoteStop}
+      onMouseDown={(e) => {
+        handleNoteChange(e.clientX, e.clientY, true);
+      }}
+      onMouseEnter={(e) => {
+        if (!mousePressed) return;
+        handleNoteChange(e.clientX, e.clientY, false);
+      }}
+      onMouseMove={(e) => {
+        if (!mousePressed) return;
+        handleNoteChange(e.clientX, e.clientY, false);
+      }}
+      onMouseUp={handleNoteStop}
+      onMouseLeave={handleNoteStop}
     >
       {Object.keys(keyboard).map((note, idx) => {
         const isBlack =
@@ -71,29 +87,7 @@ const Keyboard = ({
                 (idx >= 6 ? KEY_WIDTH / 2 : 0),
               width: isBlack ? KEY_WIDTH / 2 : KEY_WIDTH,
             }}
-            onTouchStart={() => {
-              keyboard[note].play();
-            }}
-            onTouchEnd={() => {
-              keyboard[note].stop();
-            }}
-            onMouseDown={() => {
-              keyboard[note].play();
-            }}
-            onMouseUp={() => {
-              keyboard[note].stop();
-            }}
-            onMouseEnter={() => {
-              if (!mousePressed) return;
-
-              keyboard[note].play();
-            }}
-            onMouseLeave={() => {
-              keyboard[note].stop();
-            }}
-          >
-            {note}
-          </button>
+          />
         );
       })}
     </div>

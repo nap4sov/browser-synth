@@ -1,4 +1,3 @@
-/* eslint-disable jsx-a11y/no-static-element-interactions */
 import { useState, useEffect } from 'react';
 import { getTurnAngle, percentageToValue, valueToPercentage } from './helpers';
 import './styles.css';
