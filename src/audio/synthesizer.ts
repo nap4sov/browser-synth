@@ -1,6 +1,6 @@
 import { ControlPanel, Gain, LFO, Oscillator } from './modules';
 import { notes } from './constants';
-import { TKeyboard } from './types';
+import { SynthesizerKeyboard } from './types';
 
 export default class Synthesizer {
   private osc: Oscillator;
@@ -11,7 +11,7 @@ export default class Synthesizer {
 
   private controlPanel: ControlPanel;
 
-  private keys: TKeyboard;
+  private keys: SynthesizerKeyboard;
 
   constructor(audioContext: AudioContext) {
     this.masterVolume = new Gain(audioContext);

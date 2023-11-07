@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import './styles.css';
-import { TKeyboard } from 'audio/types';
+import { SynthesizerKeyboard } from 'audio/types';
 
 const KEY_WIDTH = 60;
 
-const Keyboard = ({ keyboard }: { keyboard: TKeyboard }) => {
+const Keyboard = ({ keyboard }: { keyboard: SynthesizerKeyboard }) => {
   const [currentNote, setCurrentNote] = useState('');
   const [mousePressed, setMousePressed] = useState(false);
 

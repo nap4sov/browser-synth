@@ -1,35 +1,7 @@
+import { ControlPanelControls, ControlPanelState } from 'audio/types';
 import Gain from './Gain';
 import LFO from './LFO';
 import Oscillator from './Oscillator';
-
-export interface ControlPanelState {
-  master: {
-    volume: number;
-  };
-  oscillator: {
-    freq: number;
-    waveform: OscillatorType;
-  };
-  lfo: {
-    speed: number;
-    amount: number;
-  };
-}
-
-export interface ControlPanelControls {
-  master: {
-    setVolume: (value: number) => void;
-  };
-  oscillator: {
-    setFrequency: (value: number) => void;
-    setWaveform: (waveform: OscillatorType) => void;
-  };
-  lfo: {
-    setSpeed: (speed: number) => void;
-    setAmount: (amount: number) => void;
-    turnOff: () => void;
-  };
-}
 
 export default class ControlPanel {
   private state: ControlPanelState;
