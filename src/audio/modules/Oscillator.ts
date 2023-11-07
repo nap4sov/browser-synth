@@ -64,4 +64,8 @@ export default class Oscillator {
   connectToLfo = (lfoGain: GainNode) => {
     lfoGain.connect(this.osc.frequency);
   };
+
+  getEnvelope = () => {
+    return this.adsr;
+  };
 }

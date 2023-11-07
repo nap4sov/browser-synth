@@ -14,6 +14,13 @@ export interface ControlPanelState {
     freq: number;
     waveform: OscillatorType;
   };
+  adsr: {
+    attack: number;
+    decay: number;
+    sustainLevel: number;
+    peak: number;
+    release: number;
+  };
   lfo: {
     speed: number;
     amount: number;
@@ -27,6 +34,13 @@ export interface ControlPanelControls {
   oscillator: {
     setFrequency: (value: number) => void;
     setWaveform: (waveform: OscillatorType) => void;
+  };
+  adsr: {
+    setAttack: (attackTime: number) => void;
+    setDecay: (decayTime: number) => void;
+    setSustainLevel: (sustainLevel: number) => void;
+    setPeak: (peakMultiplier: number) => void;
+    setRelease: (releaseTime: number) => void;
   };
   lfo: {
     setSpeed: (speed: number) => void;
