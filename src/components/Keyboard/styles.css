@@ -2,13 +2,19 @@ button {
   border: none;
 }
 
+.keyboard-wrapper {
+  touch-action: none;
+}
+
 .keyboard {
   position: relative;
   display: flex;
   justify-content: center;
   width: fit-content;
   height: 220px;
-  touch-action: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
 }
 
 .note {
