@@ -1,5 +1,7 @@
-import { useState } from 'react';
-import { percentageToValue, valueToPercentage } from './helpers';
+/* eslint-disable jsx-a11y/no-static-element-interactions */
+import { useState, useEffect } from 'react';
+import { getTurnAngle, percentageToValue, valueToPercentage } from './helpers';
+import './styles.css';
 
 interface IKnobProps {
   label: string;
@@ -11,31 +13,115 @@ interface IKnobProps {
   };
 }
 
+const initialRotate = -135;
+
+const createTicks = () => {
+  const ticks = [];
+  let tickAngle = initialRotate;
+  for (let i = 0; i < 10; i += 1) {
+    const element = (
+      <div
+        key={i}
+        className="tick"
+        style={{ transform: `rotate(${tickAngle}deg)` }}
+      />
+    );
+    ticks.push(element);
+    tickAngle += 30;
+  }
+
+  return ticks;
+};
+
 const Knob = ({
   label,
   initialValue,
   handleChange,
   range: { min, max },
 }: IKnobProps) => {
-  const [percentage, setPercentage] = useState(
-    valueToPercentage(initialValue, min, max),
+  const [mousePressed, setMousePressed] = useState(false);
+  const [rotationDegree, setRotationDegree] = useState(
+    valueToPercentage(initialValue, min, max) * 100 * (270 / 100),
   );
 
+  const handleKnobTurn = (
+    knobCenterX: number,
+    knobCenterY: number,
+    cursorX: number,
+    cursorY: number,
+  ) => {
+    const angle = getTurnAngle({
+      knobCenterX,
+      knobCenterY,
+      cursorX,
+      cursorY,
+      rotationOffset: initialRotate,
+    });
+
+    if (angle >= 0 && angle <= 270) {
+      const percentage = Math.round(angle / (270 / 100));
+      const value = percentageToValue(percentage / 100, min, max);
+      handleChange(value);
+      setRotationDegree(angle);
+    }
+  };
+
+  useEffect(() => {
+    const handleMousePressed = () => {
+      setMousePressed(true);
+    };
+    const handleMouseReleased = () => {
+      setMousePressed(false);
+    };
+    window.addEventListener('mousedown', handleMousePressed);
+    window.addEventListener('mouseup', handleMouseReleased);
+    window.addEventListener('touchstart', handleMousePressed);
+    window.addEventListener('touchend', handleMouseReleased);
+
+    return () => {
+      window.removeEventListener('mousedown', handleMousePressed);
+      window.removeEventListener('mouseup', handleMouseReleased);
+    };
+  }, []);
+
   return (
-    <div>
-      <p>{label}</p>
-      <input
-        type="range"
-        min={0}
-        max={1}
-        step={0.01}
-        onChange={(e) => {
-          const val = Number(e.target.value);
-          setPercentage(val);
-          handleChange(percentageToValue(val, min, max));
+    <div className="container" id="knob-container">
+      <p className="label">{label}</p>
+      <div
+        className="knob-thumb"
+        onMouseMove={(e) => {
+          if (mousePressed) {
+            const { left, top, width, height } =
+              e.currentTarget.getBoundingClientRect();
+            handleKnobTurn(
+              left + width / 2,
+              top + height / 2,
+              e.pageX,
+              e.pageY,
+            );
+          }
         }}
-        value={percentage}
-      />
+        onTouchMove={(e) => {
+          if (mousePressed) {
+            const { left, top, width, height } =
+              e.currentTarget.getBoundingClientRect();
+            handleKnobTurn(
+              left + width / 2,
+              top + height / 2,
+              e.touches[0].clientX,
+              e.touches[0].clientY,
+            );
+          }
+        }}
+      >
+        <div
+          className="knob"
+          style={{
+            transform: `rotate(${rotationDegree + initialRotate}deg)`,
+          }}
+        />
+        {createTicks()}
+      </div>
     </div>
   );
 };
