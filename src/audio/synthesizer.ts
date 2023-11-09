@@ -1,4 +1,4 @@
-import { ControlPanel, Filter, Gain, LFO, Oscillator } from './modules';
+import { ControlPanel, Filter, Gain, LFO, Mixer, Oscillator } from './modules';
 import { notes } from './constants';
 import { SynthesizerKeyboard } from './types';
 
@@ -10,6 +10,8 @@ export default class Synthesizer {
   private masterVolume: Gain;
 
   private filter: Filter;
+
+  private mixer: Mixer;
 
   private controlPanel: ControlPanel;
 
@@ -25,15 +27,15 @@ export default class Synthesizer {
 
     this.lfo = new LFO(audioContext);
 
-    this.osc.connectToLfo(this.lfo.getGainNode());
-    this.osc.initStart();
-
-    this.controlPanel = new ControlPanel(
+    this.mixer = new Mixer(
+      audioContext,
       this.masterVolume,
       this.osc,
-      this.lfo,
       this.filter,
+      this.lfo,
     );
+
+    this.controlPanel = new ControlPanel(this.mixer);
 
     this.keys = notes.reduce(
       (acc, { note, freq }) => ({

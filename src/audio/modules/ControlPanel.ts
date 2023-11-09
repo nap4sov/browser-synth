@@ -1,15 +1,13 @@
 import { ControlPanelControls, ControlPanelState } from 'audio/types';
-import Gain from './Gain';
-import LFO from './LFO';
-import Oscillator from './Oscillator';
-import Filter from './Filter';
+import Mixer from './Mixer';
 
 export default class ControlPanel {
   private state: ControlPanelState;
 
   private controls: ControlPanelControls;
 
-  constructor(gain: Gain, oscillator: Oscillator, lfo: LFO, filter: Filter) {
+  constructor(mixer: Mixer) {
+    const { masterVolume, oscillator, lfo, filter } = mixer.getModules();
     this.state = {
       master: {
         volume: 0,
@@ -41,7 +39,7 @@ export default class ControlPanel {
         setVolume: (value) => {
           if (value < -1 || value > 0.2) return;
 
-          gain.setLevel(value);
+          masterVolume.setLevel(value);
           this.state.master.volume = value;
         },
       },
