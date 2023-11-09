@@ -1,4 +1,4 @@
-class Filter {
+export default class Filter {
   private synthCtx: AudioContext;
 
   private filterNode: BiquadFilterNode;
@@ -64,5 +64,3 @@ class Filter {
     return this.filterNode;
   };
 }
-
-export default Filter;

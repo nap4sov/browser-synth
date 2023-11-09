@@ -1,9 +1,6 @@
-import Filter from './Filter';
-import Gain from './Gain';
-import LFO from './LFO';
-import Oscillator from './Oscillator';
+import { Filter, Gain, LFO, Oscillator } from 'audio/components';
 
-class Mixer {
+export default class Mixer {
   private synthCtx: AudioContext;
 
   private mixerOut: StereoPannerNode;
@@ -52,5 +49,3 @@ class Mixer {
     return this.mixerOut;
   };
 }
-
-export default Mixer;
