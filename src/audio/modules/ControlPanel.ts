@@ -2,13 +2,14 @@ import { ControlPanelControls, ControlPanelState } from 'audio/types';
 import Gain from './Gain';
 import LFO from './LFO';
 import Oscillator from './Oscillator';
+import Filter from './Filter';
 
 export default class ControlPanel {
   private state: ControlPanelState;
 
   private controls: ControlPanelControls;
 
-  constructor(gain: Gain, oscillator: Oscillator, lfo: LFO) {
+  constructor(gain: Gain, oscillator: Oscillator, lfo: LFO, filter: Filter) {
     this.state = {
       master: {
         volume: 0,
@@ -28,11 +29,16 @@ export default class ControlPanel {
         speed: 0,
         amount: 0,
       },
+      filter: {
+        type: filter.getType(),
+        q: filter.getQ(),
+        freq: filter.getFrequency(),
+      },
     };
 
     this.controls = {
       master: {
-        setVolume: (value: number) => {
+        setVolume: (value) => {
           if (value < -1 || value > 0.2) return;
 
           gain.setLevel(value);
@@ -40,11 +46,11 @@ export default class ControlPanel {
         },
       },
       oscillator: {
-        setFrequency: (freq: number) => {
+        setFrequency: (freq) => {
           oscillator.setFrequency(freq);
           this.state.oscillator.freq = oscillator.getFrequency();
         },
-        setWaveform: (waveform: OscillatorType) => {
+        setWaveform: (waveform) => {
           oscillator.setWaveform(waveform);
           this.state.oscillator.waveform = oscillator.getWaveform();
         },
@@ -72,16 +78,27 @@ export default class ControlPanel {
         },
       },
       lfo: {
-        setSpeed: (speed: number) => {
+        setSpeed: (speed) => {
           lfo.setSpeed(speed);
           this.state.lfo.speed = speed;
         },
-        setAmount: (amount: number) => {
+        setAmount: (amount) => {
           lfo.setAmount(amount);
           this.state.lfo.amount = amount;
         },
         turnOff: () => {
           lfo.resetLfo();
+        },
+      },
+      filter: {
+        setType: (type) => {
+          filter.setType(type);
+        },
+        setQ: (q) => {
+          filter.setQ(q);
+        },
+        setFrequency: (freq) => {
+          filter.setFrequency(freq);
         },
       },
     };

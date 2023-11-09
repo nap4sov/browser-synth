@@ -25,6 +25,11 @@ export interface ControlPanelState {
     speed: number;
     amount: number;
   };
+  filter: {
+    type: BiquadFilterType;
+    q: number;
+    freq: number;
+  };
 }
 
 export interface ControlPanelControls {
@@ -46,5 +51,10 @@ export interface ControlPanelControls {
     setSpeed: (speed: number) => void;
     setAmount: (amount: number) => void;
     turnOff: () => void;
+  };
+  filter: {
+    setType: (type: BiquadFilterType) => void;
+    setQ: (q: number) => void;
+    setFrequency: (freq: number) => void;
   };
 }
