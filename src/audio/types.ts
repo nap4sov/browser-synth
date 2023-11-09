@@ -11,7 +11,6 @@ export interface ControlPanelState {
     volume: number;
   };
   oscillator: {
-    freq: number;
     waveform: OscillatorType;
   };
   adsr: {
@@ -37,7 +36,6 @@ export interface ControlPanelControls {
     setVolume: (value: number) => void;
   };
   oscillator: {
-    setFrequency: (value: number) => void;
     setWaveform: (waveform: OscillatorType) => void;
   };
   adsr: {

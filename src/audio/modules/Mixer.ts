@@ -8,7 +8,7 @@ class Mixer {
 
   private mixerOut: StereoPannerNode;
 
-  private osc: Oscillator;
+  private oscillators: Record<number, Oscillator>;
 
   private lfo: LFO;
 
@@ -16,38 +16,39 @@ class Mixer {
 
   private filter: Filter;
 
-  constructor(
-    synthCtx: AudioContext,
-    masterVolume: Gain,
-    oscillator: Oscillator,
-    filter: Filter,
-    lfo: LFO,
-  ) {
+  constructor(synthCtx: AudioContext, oscillatorFrequencies: number[] = [440]) {
     this.synthCtx = synthCtx;
     this.mixerOut = synthCtx.createStereoPanner();
-    this.masterVolume = masterVolume;
-    this.osc = oscillator;
-    this.filter = filter;
-    this.lfo = lfo;
+    this.masterVolume = new Gain(synthCtx);
+    this.filter = new Filter(synthCtx);
+    this.lfo = new LFO(synthCtx);
 
     this.masterVolume.setLevel(0);
     this.masterVolume.connectChildNode(this.mixerOut);
 
-    this.osc.connectParentNode(this.mixerOut);
-    this.osc.connectToLfo(this.lfo.getGainNode());
-    this.osc.initStart();
+    this.oscillators = oscillatorFrequencies.reduce((acc, freq) => {
+      const osc = new Oscillator(synthCtx, freq);
+      this.connectOscillator(osc);
+      return { ...acc, [freq]: osc };
+    }, {});
   }
+
+  connectOscillator = (osc: Oscillator) => {
+    osc.connectParentNode(this.mixerOut);
+    osc.connectToLfo(this.lfo.getGainNode());
+    osc.initStart();
+  };
 
   getModules = () => {
     return {
-      oscillator: this.osc,
       lfo: this.lfo,
       masterVolume: this.masterVolume,
       filter: this.filter,
+      oscillators: this.oscillators,
     };
   };
 
-  getSource = () => {
+  getMixerOut = () => {
     return this.mixerOut;
   };
 }

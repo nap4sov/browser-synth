@@ -1,4 +1,4 @@
-import { ControlPanel, Filter, Gain, LFO, Mixer, Oscillator } from './modules';
+import { ControlPanel, Mixer } from './modules';
 import { notes } from './constants';
 import { SynthesizerKeyboard } from './types';
 
@@ -12,19 +12,17 @@ export default class Synthesizer {
   constructor(audioContext: AudioContext) {
     this.mixer = new Mixer(
       audioContext,
-      new Gain(audioContext),
-      new Oscillator(audioContext, 440),
-      new Filter(audioContext),
-      new LFO(audioContext),
+      notes.map(({ freq }) => freq),
     );
 
-    this.mixer.getSource().connect(audioContext.destination);
-    const { oscillator } = this.mixer.getModules();
+    this.mixer.getMixerOut().connect(audioContext.destination);
+    const { oscillators } = this.mixer.getModules();
 
     this.controlPanel = new ControlPanel(this.mixer);
 
-    this.keys = notes.reduce(
-      (acc, { note, freq }) => ({
+    this.keys = notes.reduce((acc, { note, freq }) => {
+      const oscillator = oscillators[freq];
+      return {
         ...acc,
         [note]: {
           play: () => {
@@ -38,9 +36,8 @@ export default class Synthesizer {
             oscillator.setFrequency(freq);
           },
         },
-      }),
-      {},
-    );
+      };
+    }, {});
   }
 
   getKeys = () => {

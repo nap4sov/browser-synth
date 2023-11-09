@@ -7,21 +7,28 @@ export default class ControlPanel {
   private controls: ControlPanelControls;
 
   constructor(mixer: Mixer) {
-    const { masterVolume, oscillator, lfo, filter } = mixer.getModules();
+    const {
+      masterVolume,
+      oscillators: multiosc,
+      lfo,
+      filter,
+    } = mixer.getModules();
+
+    const oscillators = Object.values(multiosc);
+
     this.state = {
       master: {
         volume: 0,
       },
       oscillator: {
-        freq: oscillator.getFrequency(),
-        waveform: oscillator.getWaveform(),
+        waveform: oscillators[0].getWaveform(),
       },
       adsr: {
-        attack: oscillator.getEnvelope().getAttackTime(),
-        decay: oscillator.getEnvelope().getDecayTime(),
-        sustainLevel: oscillator.getEnvelope().getSustainLevel(),
-        peak: oscillator.getEnvelope().getPeakMultiplier(),
-        release: oscillator.getEnvelope().getReleaseTime(),
+        attack: oscillators[0].getEnvelope().getAttackTime(),
+        decay: oscillators[0].getEnvelope().getDecayTime(),
+        sustainLevel: oscillators[0].getEnvelope().getSustainLevel(),
+        peak: oscillators[0].getEnvelope().getPeakMultiplier(),
+        release: oscillators[0].getEnvelope().getReleaseTime(),
       },
       lfo: {
         speed: 0,
@@ -44,34 +51,42 @@ export default class ControlPanel {
         },
       },
       oscillator: {
-        setFrequency: (freq) => {
-          oscillator.setFrequency(freq);
-          this.state.oscillator.freq = oscillator.getFrequency();
-        },
         setWaveform: (waveform) => {
-          oscillator.setWaveform(waveform);
-          this.state.oscillator.waveform = oscillator.getWaveform();
+          oscillators.forEach((osc) => {
+            osc.setWaveform(waveform);
+          });
+          this.state.oscillator.waveform = oscillators[0].getWaveform();
         },
       },
       adsr: {
         setAttack: (attackTime) => {
-          oscillator.getEnvelope().setAttackTime(attackTime);
+          oscillators.forEach((osc) => {
+            osc.getEnvelope().setAttackTime(attackTime);
+          });
           this.state.adsr.attack = attackTime;
         },
         setDecay: (decayTime) => {
-          oscillator.getEnvelope().setDecayTime(decayTime);
+          oscillators.forEach((osc) => {
+            osc.getEnvelope().setDecayTime(decayTime);
+          });
           this.state.adsr.decay = decayTime;
         },
         setSustainLevel: (sustainLevel) => {
-          oscillator.getEnvelope().setSustainLevel(sustainLevel);
+          oscillators.forEach((osc) => {
+            osc.getEnvelope().setSustainLevel(sustainLevel);
+          });
           this.state.adsr.sustainLevel = sustainLevel;
         },
         setPeak: (peakMultiplier) => {
-          oscillator.getEnvelope().setPeakMultiplier(peakMultiplier);
+          oscillators.forEach((osc) => {
+            osc.getEnvelope().setPeakMultiplier(peakMultiplier);
+          });
           this.state.adsr.peak = peakMultiplier;
         },
         setRelease: (releaseTime) => {
-          oscillator.getEnvelope().setReleaseTime(releaseTime);
+          oscillators.forEach((osc) => {
+            osc.getEnvelope().setReleaseTime(releaseTime);
+          });
           this.state.adsr.release = releaseTime;
         },
       },
