@@ -13,12 +13,6 @@ export default class ADSR extends Gain {
 
   private envelopeActive = false;
 
-  constructor(synthCtx: AudioContext, parentGainNode: Gain) {
-    super(synthCtx);
-
-    parentGainNode.connectChildNode(this.gainNode);
-  }
-
   connectOscillator = (ocsillator: OscillatorNode) => {
     ocsillator.connect(this.gainNode);
   };

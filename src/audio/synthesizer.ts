@@ -3,14 +3,6 @@ import { notes } from './constants';
 import { SynthesizerKeyboard } from './types';
 
 export default class Synthesizer {
-  private osc: Oscillator;
-
-  private lfo: LFO;
-
-  private masterVolume: Gain;
-
-  private filter: Filter;
-
   private mixer: Mixer;
 
   private controlPanel: ControlPanel;
@@ -18,22 +10,16 @@ export default class Synthesizer {
   private keys: SynthesizerKeyboard;
 
   constructor(audioContext: AudioContext) {
-    this.masterVolume = new Gain(audioContext);
-    this.masterVolume.setLevel(0);
-
-    this.osc = new Oscillator(audioContext, this.masterVolume, 440);
-
-    this.filter = new Filter(audioContext);
-
-    this.lfo = new LFO(audioContext);
-
     this.mixer = new Mixer(
       audioContext,
-      this.masterVolume,
-      this.osc,
-      this.filter,
-      this.lfo,
+      new Gain(audioContext),
+      new Oscillator(audioContext, 440),
+      new Filter(audioContext),
+      new LFO(audioContext),
     );
+
+    this.mixer.getSource().connect(audioContext.destination);
+    const { oscillator } = this.mixer.getModules();
 
     this.controlPanel = new ControlPanel(this.mixer);
 
@@ -42,14 +28,14 @@ export default class Synthesizer {
         ...acc,
         [note]: {
           play: () => {
-            this.osc.setFrequency(freq);
-            this.osc.play();
+            oscillator.setFrequency(freq);
+            oscillator.play();
           },
           stop: () => {
-            this.osc.stop();
+            oscillator.stop();
           },
           changeFrequency: () => {
-            this.osc.setFrequency(freq);
+            oscillator.setFrequency(freq);
           },
         },
       }),

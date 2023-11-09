@@ -6,6 +6,8 @@ import Oscillator from './Oscillator';
 class Mixer {
   private synthCtx: AudioContext;
 
+  private mixerOut: StereoPannerNode;
+
   private osc: Oscillator;
 
   private lfo: LFO;
@@ -22,11 +24,16 @@ class Mixer {
     lfo: LFO,
   ) {
     this.synthCtx = synthCtx;
+    this.mixerOut = synthCtx.createStereoPanner();
     this.masterVolume = masterVolume;
     this.osc = oscillator;
     this.filter = filter;
     this.lfo = lfo;
 
+    this.masterVolume.setLevel(0);
+    this.masterVolume.connectChildNode(this.mixerOut);
+
+    this.osc.connectParentNode(this.mixerOut);
     this.osc.connectToLfo(this.lfo.getGainNode());
     this.osc.initStart();
   }
@@ -38,6 +45,10 @@ class Mixer {
       masterVolume: this.masterVolume,
       filter: this.filter,
     };
+  };
+
+  getSource = () => {
+    return this.mixerOut;
   };
 }
 

@@ -1,5 +1,4 @@
 import ADSR from './ADSR';
-import Gain from './Gain';
 
 export default class Oscillator {
   private synthCtx: AudioContext;
@@ -14,13 +13,13 @@ export default class Oscillator {
 
   constructor(
     synthCtx: AudioContext,
-    parentGainNode: Gain,
     freq: number,
     type: OscillatorType = 'sine',
   ) {
     this.synthCtx = synthCtx;
     this.osc = synthCtx.createOscillator();
-    this.adsr = new ADSR(synthCtx, parentGainNode);
+    this.adsr = new ADSR(synthCtx);
+
     this.frequency = freq;
     this.synthCtx = synthCtx;
 
@@ -31,6 +30,10 @@ export default class Oscillator {
     this.setFrequency(this.frequency);
     this.adsr.connectOscillator(this.osc);
     this.osc.start();
+  };
+
+  connectParentNode = (parentNode: AudioNode) => {
+    this.adsr.connectParentNode(parentNode);
   };
 
   play = () => {

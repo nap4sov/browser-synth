@@ -18,4 +18,13 @@ export default class Gain {
   connectChildNode = (childNode: AudioNode) => {
     childNode.connect(this.gainNode);
   };
+
+  connectParentNode = (parentNode: AudioNode) => {
+    this.gainNode.disconnect();
+    this.gainNode.connect(parentNode);
+  };
+
+  getGainNode = () => {
+    return this.gainNode;
+  };
 }
