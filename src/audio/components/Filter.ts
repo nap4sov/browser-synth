@@ -7,7 +7,7 @@ export default class Filter {
 
   gain = 0;
 
-  frequency = 0;
+  frequency = 300;
 
   constructor(synthCtx: AudioContext) {
     this.synthCtx = synthCtx;

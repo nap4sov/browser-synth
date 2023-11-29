@@ -20,8 +20,12 @@ export default class Mixer {
     this.filter = new Filter(synthCtx);
     this.lfo = new LFO(synthCtx);
 
-    this.masterVolume.setLevel(0);
-    this.masterVolume.connectChildNode(this.mixerOut);
+    // connect filter to master volume
+    this.filter.getFilterNode().connect(this.masterVolume.getGainNode());
+    // connect master volume to mixer out
+    this.masterVolume.connectParentNode(this.mixerOut);
+
+    this.masterVolume.setLevel(1);
 
     this.oscillators = oscillatorFrequencies.reduce((acc, freq) => {
       const osc = new Oscillator(synthCtx, freq);
@@ -31,7 +35,9 @@ export default class Mixer {
   }
 
   connectOscillator = (osc: Oscillator) => {
-    osc.connectParentNode(this.mixerOut);
+    // connect all oscillators to filter
+    osc.connectParentNode(this.filter.getFilterNode());
+    // connect lfo to all oscillators
     osc.connectToLfo(this.lfo.getGainNode());
     osc.initStart();
   };

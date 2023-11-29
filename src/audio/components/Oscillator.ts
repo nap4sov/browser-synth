@@ -1,4 +1,5 @@
 import ADSR from './ADSR';
+import Distortion from './Distortion';
 
 export default class Oscillator {
   private synthCtx: AudioContext;
@@ -6,6 +7,8 @@ export default class Oscillator {
   private osc: OscillatorNode;
 
   private adsr: ADSR;
+
+  private distortion: Distortion;
 
   private frequency: number;
 
@@ -19,6 +22,7 @@ export default class Oscillator {
     this.synthCtx = synthCtx;
     this.osc = synthCtx.createOscillator();
     this.adsr = new ADSR(synthCtx);
+    this.distortion = new Distortion(synthCtx);
 
     this.frequency = freq;
     this.synthCtx = synthCtx;
@@ -28,7 +32,8 @@ export default class Oscillator {
 
   initStart = () => {
     this.setFrequency(this.frequency);
-    this.adsr.connectOscillator(this.osc);
+    this.distortion.connectChildNode(this.osc);
+    this.distortion.connectParentNode(this.adsr.getGainNode());
     this.osc.start();
   };
 
@@ -70,5 +75,13 @@ export default class Oscillator {
 
   getEnvelope = () => {
     return this.adsr;
+  };
+
+  setDistortion = (amount: number) => {
+    this.distortion.setDistortionAmount(amount);
+  };
+
+  getDistortion = () => {
+    return this.distortion.getDistortionAmount();
   };
 }

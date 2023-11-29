@@ -22,6 +22,7 @@ export default class ControlPanel {
       },
       oscillator: {
         waveform: oscillators[0].getWaveform(),
+        distortion: oscillators[0].getDistortion(),
       },
       adsr: {
         attack: oscillators[0].getEnvelope().getAttackTime(),
@@ -38,6 +39,7 @@ export default class ControlPanel {
         type: filter.getType(),
         q: filter.getQ(),
         freq: filter.getFrequency(),
+        gain: filter.getGain(),
       },
     };
 
@@ -56,6 +58,12 @@ export default class ControlPanel {
             osc.setWaveform(waveform);
           });
           this.state.oscillator.waveform = oscillators[0].getWaveform();
+        },
+        setDistortion: (amount) => {
+          oscillators.forEach((osc) => {
+            osc.setDistortion(amount);
+          });
+          this.state.oscillator.distortion = oscillators[0].getDistortion();
         },
       },
       adsr: {
@@ -112,6 +120,9 @@ export default class ControlPanel {
         },
         setFrequency: (freq) => {
           filter.setFrequency(freq);
+        },
+        setGain: (gain) => {
+          filter.setGain(gain);
         },
       },
     };

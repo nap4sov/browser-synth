@@ -3,12 +3,15 @@ export default class Gain {
 
   protected synthCtx: AudioContext;
 
-  constructor(synthCtx: AudioContext) {
+  constructor(synthCtx: AudioContext, connectToCtxDestination?: boolean) {
     this.gainNode = synthCtx.createGain();
     this.synthCtx = synthCtx;
 
     this.gainNode.gain.setValueAtTime(0, synthCtx.currentTime);
-    this.gainNode.connect(synthCtx.destination);
+
+    if (connectToCtxDestination) {
+      this.gainNode.connect(synthCtx.destination);
+    }
   }
 
   setLevel = (value: number) => {

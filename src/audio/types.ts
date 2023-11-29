@@ -12,6 +12,7 @@ export interface ControlPanelState {
   };
   oscillator: {
     waveform: OscillatorType;
+    distortion: number;
   };
   adsr: {
     attack: number;
@@ -28,6 +29,7 @@ export interface ControlPanelState {
     type: BiquadFilterType;
     q: number;
     freq: number;
+    gain: number;
   };
 }
 
@@ -37,6 +39,7 @@ export interface ControlPanelControls {
   };
   oscillator: {
     setWaveform: (waveform: OscillatorType) => void;
+    setDistortion: (amount: number) => void;
   };
   adsr: {
     setAttack: (attackTime: number) => void;
@@ -54,5 +57,6 @@ export interface ControlPanelControls {
     setType: (type: BiquadFilterType) => void;
     setQ: (q: number) => void;
     setFrequency: (freq: number) => void;
+    setGain: (gain: number) => void;
   };
 }
