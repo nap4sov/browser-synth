@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { getTurnAngle, percentageToValue, valueToPercentage } from './helpers';
 import './styles.css';
 
@@ -65,50 +65,26 @@ const Knob = ({
     }
   };
 
-  useEffect(() => {
-    const handleMousePressed = () => {
-      setMousePressed(true);
-    };
-    const handleMouseReleased = () => {
-      setMousePressed(false);
-    };
-    window.addEventListener('mousedown', handleMousePressed);
-    window.addEventListener('mouseup', handleMouseReleased);
-    window.addEventListener('touchstart', handleMousePressed);
-    window.addEventListener('touchend', handleMouseReleased);
-
-    return () => {
-      window.removeEventListener('mousedown', handleMousePressed);
-      window.removeEventListener('mouseup', handleMouseReleased);
-    };
-  }, []);
-
   return (
-    <div className="container" id="knob-container">
+    <div className="container" id={`knob-container-${label}`}>
       <p className="label">{label}</p>
       <div
         className="knob-thumb"
-        onMouseMove={(e) => {
-          if (mousePressed) {
-            const { left, top, width, height } =
-              e.currentTarget.getBoundingClientRect();
-            handleKnobTurn(
-              left + width / 2,
-              top + height / 2,
-              e.pageX,
-              e.pageY,
-            );
-          }
+        onPointerDown={() => {
+          setMousePressed(true);
         }}
-        onTouchMove={(e) => {
+        onPointerUp={() => {
+          setMousePressed(false);
+        }}
+        onPointerMove={(e) => {
           if (mousePressed) {
             const { left, top, width, height } =
               e.currentTarget.getBoundingClientRect();
             handleKnobTurn(
               left + width / 2,
               top + height / 2,
-              e.touches[0].clientX,
-              e.touches[0].clientY,
+              e.clientX,
+              e.clientY,
             );
           }
         }}

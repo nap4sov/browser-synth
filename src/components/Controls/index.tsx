@@ -1,5 +1,5 @@
 import Synthesizer from 'audio/synthesizer';
-import { waveforms } from 'audio/constants';
+import { waveforms, filterTypes } from 'audio/constants';
 import { ControlsBlock, Knob } from 'components/UiKit';
 
 const Controls = ({ synth }: { synth: Synthesizer }) => {
@@ -18,6 +18,24 @@ const Controls = ({ synth }: { synth: Synthesizer }) => {
         <ControlsBlock
           label="Master"
           elements={[
+            <Knob
+              label="Volume"
+              initialValue={initialState.master.volume}
+              handleChange={(value) => {
+                controls.master.setVolume(value);
+              }}
+              range={{ min: -1, max: 0.2 }}
+              key="master volume"
+            />,
+            <Knob
+              label="Distortion"
+              initialValue={initialState.oscillator.distortion}
+              handleChange={(value) => {
+                controls.oscillator.setDistortion(value);
+              }}
+              range={{ min: 0, max: 100 }}
+              key="distortion"
+            />,
             <div key="waveform">
               <p>Waveform</p>
               <select
@@ -35,14 +53,74 @@ const Controls = ({ synth }: { synth: Synthesizer }) => {
                 ))}
               </select>
             </div>,
+            <div key="filter-type">
+              <p>Filter Type</p>
+              <select
+                onChange={({ target }) => {
+                  if (!controls) return;
+                  controls.filter.setType(target.value as BiquadFilterType);
+                }}
+              >
+                {filterTypes.map((type) => (
+                  <option value={type} key={type}>
+                    {type}
+                  </option>
+                ))}
+              </select>
+            </div>,
+          ]}
+        />
+        <ControlsBlock
+          label="Filter"
+          elements={[
             <Knob
-              label="Volume"
-              initialValue={initialState.master.volume}
-              handleChange={(value) => {
-                controls.master.setVolume(value);
-              }}
-              range={{ min: -1, max: 0.2 }}
-              key="master volume"
+              label="Q"
+              initialValue={initialState.filter.q}
+              range={{ min: 0, max: 3 }}
+              handleChange={(value) => controls.filter.setQ(value)}
+              key="filter-q"
+            />,
+            <Knob
+              label="Frequency"
+              initialValue={initialState.filter.freq}
+              range={{ min: 0, max: 20000 }}
+              handleChange={(value) => controls.filter.setFrequency(value)}
+              key="filter-freq"
+            />,
+          ]}
+        />
+      </div>
+      <div>
+        <ControlsBlock
+          label="Envelope"
+          elements={[
+            <Knob
+              label="Attack"
+              initialValue={initialState.adsr.attack}
+              range={{ min: 0.01, max: 1 }}
+              handleChange={(value) => controls.adsr.setAttack(value)}
+              key="attack"
+            />,
+            <Knob
+              label="Decay"
+              initialValue={initialState.adsr.decay}
+              range={{ min: 0.01, max: 1 }}
+              handleChange={(value) => controls.adsr.setDecay(value)}
+              key="decay"
+            />,
+            <Knob
+              label="Sustain"
+              initialValue={initialState.adsr.release}
+              range={{ min: 0.01, max: 1 }}
+              handleChange={(value) => controls.adsr.setRelease(value)}
+              key="sustain"
+            />,
+            <Knob
+              label="Peak"
+              initialValue={initialState.adsr.peak}
+              range={{ min: 0.01, max: 1 }}
+              handleChange={(value) => controls.adsr.setPeak(value)}
+              key="release"
             />,
           ]}
         />
@@ -66,40 +144,6 @@ const Controls = ({ synth }: { synth: Synthesizer }) => {
           ]}
         />
       </div>
-
-      <ControlsBlock
-        label="Envelope"
-        elements={[
-          <Knob
-            label="Attack"
-            initialValue={initialState.adsr.attack}
-            range={{ min: 0.01, max: 1 }}
-            handleChange={(value) => controls.adsr.setAttack(value)}
-            key="attack"
-          />,
-          <Knob
-            label="Decay"
-            initialValue={initialState.adsr.decay}
-            range={{ min: 0.01, max: 1 }}
-            handleChange={(value) => controls.adsr.setDecay(value)}
-            key="decay"
-          />,
-          <Knob
-            label="Sustain"
-            initialValue={initialState.adsr.release}
-            range={{ min: 0.01, max: 1 }}
-            handleChange={(value) => controls.adsr.setRelease(value)}
-            key="sustain"
-          />,
-          <Knob
-            label="Peak"
-            initialValue={initialState.adsr.peak}
-            range={{ min: 0.01, max: 1 }}
-            handleChange={(value) => controls.adsr.setPeak(value)}
-            key="release"
-          />,
-        ]}
-      />
     </div>
   );
 };
