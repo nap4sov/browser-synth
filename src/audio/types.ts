@@ -1,7 +1,8 @@
 export interface IKeyboardKey {
   play: () => void;
   stop: () => void;
-  changeFrequency: () => void;
+  changeFrequency: (value?: number) => void;
+  getFrequency: () => number;
 }
 
 export type SynthesizerKeyboard = Record<string, IKeyboardKey>;

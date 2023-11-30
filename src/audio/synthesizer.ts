@@ -9,10 +9,15 @@ export default class Synthesizer {
 
   private keys: SynthesizerKeyboard;
 
-  constructor(audioContext: AudioContext) {
+  constructor(
+    audioContext: AudioContext,
+    customNotes: { freq: number; note: string }[],
+  ) {
+    const notesArray = customNotes.length ? customNotes : notes;
+
     this.mixer = new Mixer(
       audioContext,
-      notes.map(({ freq }) => freq),
+      notesArray.map(({ freq }) => freq),
     );
 
     this.mixer.getMixerOut().connect(audioContext.destination);
@@ -20,7 +25,7 @@ export default class Synthesizer {
 
     this.controlPanel = new ControlPanel(this.mixer);
 
-    this.keys = notes.reduce((acc, { note, freq }) => {
+    this.keys = notesArray.reduce((acc, { note, freq }) => {
       const oscillator = oscillators[freq];
       return {
         ...acc,
@@ -32,8 +37,11 @@ export default class Synthesizer {
           stop: () => {
             oscillator.stop();
           },
-          changeFrequency: () => {
-            oscillator.setFrequency(freq);
+          changeFrequency: (value?: number) => {
+            oscillator.setFrequency(value || freq);
+          },
+          getFrequency: () => {
+            return freq;
           },
         },
       };

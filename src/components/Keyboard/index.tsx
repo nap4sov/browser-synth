@@ -1,87 +1,81 @@
-import { useState, useEffect } from 'react';
+import { PointerEventHandler } from 'react';
 import './styles.css';
 import { SynthesizerKeyboard } from 'audio/types';
+import { getKeyboardByOctaves, getKeyProps } from './helpers';
 
-const KEY_WIDTH = 60;
+const currentNotes = new Map<number, string>();
 
 const Keyboard = ({ keyboard }: { keyboard: SynthesizerKeyboard }) => {
-  const [currentNote, setCurrentNote] = useState('');
-  const [pointerPressed, setPointerPressed] = useState(false);
-
-  const handleNoteChange = (x: number, y: number, isStart: boolean) => {
-    const element = document.elementFromPoint(x, y);
+  const handleNotesChange: PointerEventHandler<HTMLDivElement> = ({
+    clientX,
+    clientY,
+    pointerId,
+    nativeEvent,
+  }) => {
+    // pointer event combined with pointer id allows multitouch handling on any device
+    const element = document.elementFromPoint(clientX, clientY);
     const note = element?.getAttribute('data-note');
 
-    if (!note || note === currentNote) return;
+    if (!note) return;
 
-    setCurrentNote(note);
-    if (isStart) {
+    // start new oscillator only on initial touch/click
+    if (nativeEvent.type === 'pointerdown') {
+      currentNotes.set(pointerId, note);
       keyboard[note].play();
     } else {
-      keyboard[note].changeFrequency();
+      // on pointer move change ringing ocsillator frequency
+      const currentFrequency = keyboard[note].getFrequency();
+      const heldNote = currentNotes.get(pointerId);
+      keyboard[heldNote || note].changeFrequency(currentFrequency);
     }
   };
 
-  const handleNoteStop = () => {
-    if (!currentNote) return;
+  const handleNoteStop = (pointerId: number) => {
+    const note = currentNotes.get(pointerId);
+    if (!note) return;
 
-    keyboard[currentNote].stop();
-    setCurrentNote('');
+    keyboard[note].stop();
+    currentNotes.delete(pointerId);
   };
-
-  useEffect(() => {
-    const handlePointerPressed = () => {
-      setPointerPressed(true);
-    };
-    const handlePointerReleased = () => {
-      setPointerPressed(false);
-    };
-    window.addEventListener('pointerdown', handlePointerPressed);
-    window.addEventListener('pointerup', handlePointerReleased);
-
-    return () => {
-      window.removeEventListener('pointerdown', handlePointerPressed);
-      window.removeEventListener('pointerup', handlePointerReleased);
-    };
-  }, []);
 
   return (
     <div className="keyboard-wrapper">
       <div
         className="keyboard"
-        onPointerDown={(e) => {
-          handleNoteChange(e.clientX, e.clientY, true);
-        }}
+        onPointerDown={handleNotesChange}
         onPointerEnter={(e) => {
-          if (!pointerPressed) return;
-          handleNoteChange(e.clientX, e.clientY, false);
+          if (!currentNotes.has(e.pointerId)) return;
+          handleNotesChange(e);
         }}
         onPointerMove={(e) => {
-          if (!pointerPressed) return;
-          handleNoteChange(e.clientX, e.clientY, false);
+          if (!currentNotes.has(e.pointerId)) return;
+          handleNotesChange(e);
         }}
-        onPointerUp={handleNoteStop}
-        onPointerLeave={handleNoteStop}
-        onPointerCancel={handleNoteStop}
+        onPointerUp={(e) => handleNoteStop(e.pointerId)}
+        onPointerLeave={(e) => handleNoteStop(e.pointerId)}
+        onPointerCancel={(e) => handleNoteStop(e.pointerId)}
       >
-        {Object.keys(keyboard).map((note, idx) => {
-          const isBlack =
-            idx === 1 || idx === 3 || idx === 6 || idx === 8 || idx === 10;
-          return (
-            <div
-              key={note}
-              data-note={note}
-              className={isBlack ? 'note black' : 'note white'}
-              style={{
-                left:
-                  (KEY_WIDTH / 2) * idx +
-                  KEY_WIDTH / 4 +
-                  (idx >= 6 ? KEY_WIDTH / 2 : 0),
-                width: isBlack ? KEY_WIDTH / 2 : KEY_WIDTH,
-              }}
-            />
-          );
-        })}
+        {getKeyboardByOctaves(keyboard).map((octave, octaveIdx) =>
+          octave.map((key, idx) => {
+            const note = Object.keys(key)[0];
+            const { isBlack, leftOffset, width } = getKeyProps(
+              note,
+              idx,
+              octaveIdx,
+            );
+            return (
+              <div
+                key={note}
+                data-note={note}
+                className={isBlack ? 'note black' : 'note white'}
+                style={{
+                  left: leftOffset,
+                  width,
+                }}
+              />
+            );
+          }),
+        )}
       </div>
     </div>
   );

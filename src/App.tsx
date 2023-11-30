@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import Synthesizer from 'audio/synthesizer';
 import { createSynthesizer } from 'audio';
+import Synthesizer from 'audio/synthesizer';
 import Keyboard from 'components/Keyboard';
 import Controls from 'components/Controls';
+import notes from 'assets/notes';
 
 const App = () => {
   const [audioAllowed, setAudioAllowed] = useState(false);
@@ -11,7 +12,7 @@ const App = () => {
   useEffect(() => {
     if (!audioAllowed) return;
 
-    const syntesizer = createSynthesizer();
+    const syntesizer = createSynthesizer(notes);
     setSynth(syntesizer);
   }, [audioAllowed]);
 
