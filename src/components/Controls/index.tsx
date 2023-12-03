@@ -1,5 +1,4 @@
-import Synthesizer from 'audio/synthesizer';
-import { waveforms, filterTypes } from 'audio/constants';
+import { Synthesizer, waveforms, filterTypes } from 'browser-synth-sdk';
 import { ControlsBlock, Knob } from 'components/UiKit';
 
 const Controls = ({ synth }: { synth: Synthesizer }) => {
@@ -24,7 +23,7 @@ const Controls = ({ synth }: { synth: Synthesizer }) => {
               handleChange={(value) => {
                 controls.master.setVolume(value);
               }}
-              range={{ min: -1, max: 0.2 }}
+              range={{ min: 0, max: 1 }}
               key="master volume"
             />,
             <Knob

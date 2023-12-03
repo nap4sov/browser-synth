@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
-import { createSynthesizer } from 'audio';
-import Synthesizer from 'audio/synthesizer';
+import { createSynthesizer, Synthesizer } from 'browser-synth-sdk';
 import Keyboard from 'components/Keyboard';
 import Controls from 'components/Controls';
 import notes from 'assets/notes';
@@ -12,7 +11,7 @@ const App = () => {
   useEffect(() => {
     if (!audioAllowed) return;
 
-    const syntesizer = createSynthesizer(notes);
+    const syntesizer = createSynthesizer({ notes });
     setSynth(syntesizer);
   }, [audioAllowed]);
 

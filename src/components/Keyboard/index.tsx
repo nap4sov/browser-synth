@@ -1,6 +1,6 @@
 import { PointerEventHandler } from 'react';
 import './styles.css';
-import { SynthesizerKeyboard } from 'audio/types';
+import { SynthesizerKeyboard } from 'browser-synth-sdk/dist/types';
 import { getKeyboardByOctaves, getKeyProps } from './helpers';
 
 const currentNotes = new Map<number, string>();

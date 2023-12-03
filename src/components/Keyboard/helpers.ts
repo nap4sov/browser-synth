@@ -1,4 +1,4 @@
-import { SynthesizerKeyboard } from 'audio/types';
+import { SynthesizerKeyboard } from 'browser-synth-sdk/dist/types';
 
 export const KEY_WIDTH = 60;
 
